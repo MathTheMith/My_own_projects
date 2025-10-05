@@ -19,6 +19,14 @@ void show_knight_moves(int x, int y, Texture2D board[BOARD_SIZE][BOARD_SIZE]);
 bool is_valid_move(int x, int y, Texture2D board[BOARD_SIZE][BOARD_SIZE]);
 void show_wpawns_moves(int x, int y, Texture2D board[BOARD_SIZE][BOARD_SIZE]);
 void show_bpawns_moves(int x, int y, Texture2D board[BOARD_SIZE][BOARD_SIZE]);
-
+void init_board(Texture2D board[BOARD_SIZE][BOARD_SIZE]);
+bool is_valid_destination(Texture2D board[BOARD_SIZE][BOARD_SIZE], int old_x, int old_y, int new_x, int new_y);
+bool is_valid_rook_move(Texture2D board[BOARD_SIZE][BOARD_SIZE], int old_x, int old_y, int new_x, int new_y);
+bool is_valid_bishop_move(Texture2D board[BOARD_SIZE][BOARD_SIZE], int old_x, int old_y, int new_x, int new_y);
+bool is_valid_knight_move(Texture2D board[BOARD_SIZE][BOARD_SIZE], int old_x, int old_y, int new_x, int new_y);
+bool is_valid_queen_move(Texture2D board[BOARD_SIZE][BOARD_SIZE], int old_x, int old_y, int new_x, int new_y);
+bool is_valid_king_move(Texture2D board[BOARD_SIZE][BOARD_SIZE], int old_x, int old_y, int new_x, int new_y);
+bool is_valid_wpawn_move(Texture2D board[BOARD_SIZE][BOARD_SIZE], int old_x, int old_y, int new_x, int new_y);
+bool is_valid_bpawn_move(Texture2D board[BOARD_SIZE][BOARD_SIZE], int old_x, int old_y, int new_x, int new_y);
 
 #endif

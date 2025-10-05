@@ -6,7 +6,7 @@ int main() {
     const int screenHeight = 1000;
 
     InitWindow(screenWidth, screenHeight, "Jeu d'échecs");
-
+    SetTraceLogLevel(LOG_NONE);
     set_board();
     CloseWindow();
     return 0;

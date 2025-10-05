@@ -1,4 +1,3 @@
-#include "raylib.h"
 #include "chess_game.h"
 
 #define BOARD_SIZE 10
@@ -14,47 +13,16 @@ void set_board() {
     Color lightBeige = (Color){240, 218, 181, 255};
     Color lightBlack = (Color){22, 21, 17, 220};
 
-    wP = LoadTexture("./Images/wP.png");
-    bP = LoadTexture("./Images/bP.png");
-    wR = LoadTexture("./Images/wR.png");
-    bR = LoadTexture("./Images/bR.png");
-    wN = LoadTexture("./Images/wN.png");
-    bN = LoadTexture("./Images/bN.png");
-    wB = LoadTexture("./Images/wB.png");
-    bB = LoadTexture("./Images/bB.png");
-    wK = LoadTexture("./Images/wK.png");
-    bK = LoadTexture("./Images/bK.png");
-    wQ = LoadTexture("./Images/wQ.png");
-    bQ = LoadTexture("./Images/bQ.png");
-
     Texture2D board[BOARD_SIZE][BOARD_SIZE] = {0};
-    
-    board[1][8] = wR; board[8][8] = wR;
-    board[2][8] = wN; board[7][8] = wN;
-    board[3][8] = wB; board[6][8] = wB;
-    board[4][8] = wK; board[5][8] = wQ;
+    Texture2D current_piece = {0};
 
-    board[1][1] = bR; board[8][1] = bR;
-    board[2][1] = bN; board[7][1] = bN;
-    board[3][1] = bB; board[6][1] = bB;
-    board[4][1] = bK; board[5][1] = bQ;
-
-    int i = 1;
-    while (i < 9) {
-        board[i][7] = wP;
-        i++;
-    }
-    
-    int j = 1;
-    while (j < 9) {
-        board[j][2] = bP;
-        j++;
-    }
-
+    int current_turn = 0;
     int is_piece = 0;
     int old_x;
     int old_y;
-    Texture2D current_piece = {0};
+
+    SetTargetFPS(60);
+    init_board(board);
 
     while (!WindowShouldClose()) {
         Vector2 mousePos = GetMousePosition();
@@ -62,7 +30,6 @@ void set_board() {
         int y = mousePos.y / 100;
         BeginDrawing();
         ClearBackground(RAYWHITE);
-        SetTargetFPS(60);
 
         int i = 0;
         while (i < BOARD_SIZE) {
@@ -84,25 +51,50 @@ void set_board() {
         if (is_piece == 1) {
             show_possibles_moves(board, old_x, old_y);
         }
-        if (is_piece_on_square(board, x, y) && CheckCollisionPointRec(mousePos, (Rectangle){x * 100, y * 100, 100, 100}) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
-            if (is_piece == 0) {
-                old_x = x;
-                old_y = y;
-                current_piece = board[x][y];
-                is_piece = 1;
-                show_possibles_moves(board, x, y);
+        if (CheckCollisionPointRec(mousePos, (Rectangle){x * 100, y * 100, 100, 100}) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+            
+            if (is_piece == 0 && is_piece_on_square(board, x, y)) {
+                bool is_white_piece = (board[x][y].id == wR.id || board[x][y].id == wN.id || 
+                                       board[x][y].id == wB.id || board[x][y].id == wK.id || 
+                                       board[x][y].id == wQ.id || board[x][y].id == wP.id);
+                
+                bool is_black_piece = (board[x][y].id == bR.id || board[x][y].id == bN.id || 
+                                       board[x][y].id == bB.id || board[x][y].id == bK.id || 
+                                       board[x][y].id == bQ.id || board[x][y].id == bP.id);
+                if ((current_turn == 0 && is_white_piece) || (current_turn == 1 && is_black_piece)) {
+                    old_x = x;
+                    old_y = y;
+                    current_piece = board[x][y];
+                    is_piece = 1;
+                }
             }
-            if (is_piece == 1 && can_capture(board, x, y, old_x, old_y)) {
-                board[x][y] = current_piece;
-                board[old_x][old_y] = (Texture2D){0};
-                is_piece = 0;
+            else if (is_piece == 1) {
+                if (is_valid_destination(board, old_x, old_y, x, y)) {
+                    board[x][y] = current_piece;
+                    board[old_x][old_y] = (Texture2D){0};
+                    is_piece = 0;
+                    current_turn = 1 - current_turn;
+                }
+                else if (is_piece_on_square(board, x, y)) {
+                    bool is_white_piece = (board[x][y].id == wR.id || board[x][y].id == wN.id || 
+                                           board[x][y].id == wB.id || board[x][y].id == wK.id || 
+                                           board[x][y].id == wQ.id || board[x][y].id == wP.id);
+                    
+                    bool is_black_piece = (board[x][y].id == bR.id || board[x][y].id == bN.id || 
+                                           board[x][y].id == bB.id || board[x][y].id == bK.id || 
+                                           board[x][y].id == bQ.id || board[x][y].id == bP.id);
+                    
+                    if ((current_turn == 0 && is_white_piece) || (current_turn == 1 && is_black_piece)) {
+                        old_x = x;
+                        old_y = y;
+                        current_piece = board[x][y];
+                        is_piece = 1;
+                    }
+                }
+                else {
+                    is_piece = 0;
+                }
             }
-        }
-
-        if (is_piece == 1 && !is_piece_on_square(board, x, y) && CheckCollisionPointRec(mousePos, (Rectangle){x * 100, y * 100, 100, 100}) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
-            board[x][y] = current_piece;
-            board[old_x][old_y] = (Texture2D){0};
-            is_piece = 0;
         }
 
         EndDrawing();
